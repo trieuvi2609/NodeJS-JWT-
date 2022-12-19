@@ -27,14 +27,16 @@ const HomePage = () => {
       return err
     }
   } 
-  //DUMMY DATA
-  
   axiosJWT.interceptors.request.use(
     async(config) => {
       let date= new Date()
       const decodedToken = jwtDecode(user?.data.access_token)
       if (decodedToken.exp < date.getTime()/1000){
         const data = await refreshToken();
+        if (!data) {
+          dispatch(logOut())
+          navigate('/login')
+        }
         const refreshUser = {
           ...user.data, 
           access_token: data.access_token 
